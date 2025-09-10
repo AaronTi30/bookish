@@ -61,7 +61,7 @@ class _ReviewDialogState extends State<ReviewDialog> {
               ),
               const SizedBox(height: 16),
 
-              // Star rating
+              // Star rating with 5 visual stars
               _buildStarRating(),
               const SizedBox(height: 8),
 
@@ -94,7 +94,7 @@ class _ReviewDialogState extends State<ReviewDialog> {
                   contentPadding: const EdgeInsets.all(12),
                 ),
                 onChanged: (value) {
-                  setState(() {}); // Rebuild to update character count
+                  setState(() {});
                 },
               ),
               const SizedBox(height: 4),
@@ -104,6 +104,17 @@ class _ReviewDialogState extends State<ReviewDialog> {
                 textAlign: TextAlign.end,
               ),
               const SizedBox(height: 20),
+
+              // Instructions for half stars
+              Text(
+                '💡 Tip: Double-tap a star for half rating',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.blue[700],
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+              const SizedBox(height: 16),
 
               // Action buttons
               Row(
@@ -142,51 +153,54 @@ class _ReviewDialogState extends State<ReviewDialog> {
   }
 
   Widget _buildStarRating() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: List.generate(5, (index) {
-          final starIndex = index ~/ 2;
-          final isHalfStar = index.isOdd;
-          final ratingValue = starIndex + (isHalfStar ? 0.5 : 1.0);
-
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                _currentRating = ratingValue;
-              });
-              // Auto-focus on review field after rating
-              if (_currentRating > 0) {
-                FocusScope.of(context).requestFocus(_reviewFocusNode);
-              }
-            },
-            child: MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 1),
-                child: Icon(
-                  _getStarIcon(ratingValue),
-                  size: 30,
-                  color: Colors.amber,
-                ),
-              ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(5, (index) {
+        final starNumber = index + 1;
+        return GestureDetector(
+          onTap: () {
+            // Single tap: set whole star
+            setState(() {
+              _currentRating = starNumber.toDouble();
+            });
+            _autoFocusReview();
+          },
+          onDoubleTap: () {
+            // Double tap: set half star
+            setState(() {
+              _currentRating = starNumber - 0.5;
+            });
+            _autoFocusReview();
+          },
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: _buildStarIcon(starNumber.toDouble()),
             ),
-          );
-        }),
-      ),
+          ),
+        );
+      }),
     );
   }
 
-  IconData _getStarIcon(double ratingValue) {
-    if (_currentRating >= ratingValue) {
-      return Icons.star;
-    } else if (_currentRating >= ratingValue - 0.5 &&
-        _currentRating < ratingValue) {
-      return Icons.star_half;
+  Widget _buildStarIcon(double starValue) {
+    if (_currentRating >= starValue) {
+      // Full star
+      return const Icon(Icons.star, size: 36, color: Colors.amber);
+    } else if (_currentRating >= starValue - 0.5) {
+      // Half star
+      return const Icon(Icons.star_half, size: 36, color: Colors.amber);
     } else {
-      return Icons.star_border;
+      // Empty star
+      return const Icon(Icons.star_border, size: 36, color: Colors.amber);
+    }
+  }
+
+  void _autoFocusReview() {
+    // Auto-focus on review field after rating
+    if (_currentRating > 0) {
+      FocusScope.of(context).requestFocus(_reviewFocusNode);
     }
   }
 
@@ -208,7 +222,6 @@ class _ReviewDialogState extends State<ReviewDialog> {
   void _submitReview() async {
     setState(() => _isSubmitting = true);
 
-    // Simulate API call delay
     await Future.delayed(const Duration(milliseconds: 500));
 
     if (mounted) {
@@ -220,7 +233,6 @@ class _ReviewDialogState extends State<ReviewDialog> {
   }
 }
 
-// Helper function to show the review dialog
 void showReviewDialog({
   required BuildContext context,
   required String bookTitle,
