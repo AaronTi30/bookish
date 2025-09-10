@@ -1,6 +1,7 @@
 import 'package:bookish/models/book_detail.dart';
 import 'package:bookish/screens/my_books_screen.dart';
 import 'package:bookish/screens/profile_screen.dart';
+import 'package:bookish/screens/search_screen.dart';
 import 'package:flutter/material.dart';
 import '../widgets/book_card.dart';
 import '../models/book.dart';
@@ -341,6 +342,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 IconButton(
                   icon: const Icon(Icons.search),
                   onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SearchScreen(),
+                      ),
+                    );
                     // Navigate to search screen
                   },
                 ),

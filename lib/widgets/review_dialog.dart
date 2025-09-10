@@ -152,6 +152,8 @@ class _ReviewDialogState extends State<ReviewDialog> {
     );
   }
 
+  final List<bool> _starHoverStates = [false, false, false, false, false];
+
   Widget _buildStarRating() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -172,10 +174,16 @@ class _ReviewDialogState extends State<ReviewDialog> {
             });
             _autoFocusReview();
           },
+          onTapDown: (_) => setState(() => _starHoverStates[index] = true),
+          onTapUp: (_) => setState(() => _starHoverStates[index] = false),
+          onTapCancel: () => setState(() => _starHoverStates[index] = false),
           child: MouseRegion(
             cursor: SystemMouseCursors.click,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
+            onEnter: (_) => setState(() => _starHoverStates[index] = true),
+            onExit: (_) => setState(() => _starHoverStates[index] = false),
+            child: AnimatedScale(
+              duration: const Duration(milliseconds: 150),
+              scale: _starHoverStates[index] ? 1.2 : 1.0,
               child: _buildStarIcon(starNumber.toDouble()),
             ),
           ),
