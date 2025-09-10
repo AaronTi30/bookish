@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/book_detail.dart';
+import '../widgets/review_dialog.dart';
 
 class BookDetailScreen extends StatefulWidget {
   final BookDetail book;
@@ -23,9 +24,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
           SliverAppBar(
             expandedHeight: 300,
             pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              background: _buildBookCover(),
-            ),
+            flexibleSpace: FlexibleSpaceBar(background: _buildBookCover()),
             leading: IconButton(
               icon: Container(
                 padding: const EdgeInsets.all(8),
@@ -105,10 +104,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
           const SizedBox(height: 8),
           Text(
             widget.book.authors.join(', '),
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey[700],
-            ),
+            style: TextStyle(fontSize: 18, color: Colors.grey[700]),
           ),
           const SizedBox(height: 16),
           _buildRatingSection(),
@@ -130,16 +126,16 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
           ),
           const SizedBox(width: 8),
         ],
-        
+
         // Ratings count
         if (widget.book.ratingsCount != null)
           Text(
             '(${widget.book.ratingsCount!.formatCount()} ratings)',
             style: TextStyle(color: Colors.grey[600]),
           ),
-        
+
         const Spacer(),
-        
+
         // Review count
         if (widget.book.reviewCount != null)
           Text(
@@ -170,32 +166,18 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // Action buttons row
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  icon: const Icon(Icons.star_outline, size: 20),
-                  label: const Text('Rate'),
-                  onPressed: () => _showRatingDialog(),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                ),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              icon: const Icon(Icons.reviews, size: 20),
+              label: const Text('Write a Review'),
+              onPressed: () => _showReviewDialog(),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: OutlinedButton.icon(
-                  icon: const Icon(Icons.reviews_outlined, size: 20),
-                  label: const Text('Review'),
-                  onPressed: () => _showReviewDialog(),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         ],
       ),
@@ -228,7 +210,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
 
   Widget _buildDescription() {
     if (widget.book.description == null) return const SizedBox();
-    
+
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -236,18 +218,15 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
         children: [
           const Text(
             'Description',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
           Text(
             _isDescriptionExpanded
                 ? widget.book.description!
                 : widget.book.description!.length > 200
-                    ? '${widget.book.description!.substring(0, 200)}...'
-                    : widget.book.description!,
+                ? '${widget.book.description!.substring(0, 200)}...'
+                : widget.book.description!,
             style: TextStyle(
               fontSize: 16,
               height: 1.5,
@@ -256,7 +235,9 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
           ),
           if (widget.book.description!.length > 200)
             TextButton(
-              onPressed: () => setState(() => _isDescriptionExpanded = !_isDescriptionExpanded),
+              onPressed: () => setState(
+                () => _isDescriptionExpanded = !_isDescriptionExpanded,
+              ),
               child: Text(
                 _isDescriptionExpanded ? 'Show less' : 'Read more',
                 style: const TextStyle(color: Colors.blue),
@@ -275,13 +256,13 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
         children: [
           const Text(
             'Book Details',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          _buildDetailRow('Published', widget.book.publishedDate?.year.toString()),
+          _buildDetailRow(
+            'Published',
+            widget.book.publishedDate?.year.toString(),
+          ),
           _buildDetailRow('Publisher', widget.book.publisher),
           _buildDetailRow('Pages', widget.book.pageCount?.toString()),
           _buildDetailRow('ISBN', widget.book.isbn),
@@ -295,7 +276,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
 
   Widget _buildDetailRow(String label, String? value) {
     if (value == null) return const SizedBox();
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
@@ -312,12 +293,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
             ),
           ),
           const SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 16),
-            ),
-          ),
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 16))),
         ],
       ),
     );
@@ -331,10 +307,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
         children: [
           const Text(
             'Reviews',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
           // Placeholder for reviews - we'll implement this later
@@ -350,10 +323,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                 const SizedBox(height: 16),
                 const Text(
                   'No reviews yet',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
-                  ),
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
               ],
             ),
@@ -363,14 +333,23 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
     );
   }
 
-  void _showRatingDialog() {
-    // Implement rating dialog
-    print('Show rating dialog for ${widget.book.title}');
-  }
-
   void _showReviewDialog() {
-    // Implement review dialog
-    print('Show review dialog for ${widget.book.title}');
+    // Implement rating dialog
+    showReviewDialog(
+      context: context,
+      bookTitle: widget.book.title,
+      initialRating: 0,
+      onReviewSubmitted: (rating, review) {
+        //Handle the submitted rating
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Rated "${widget.book.title}" with $rating stars!'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      },
+    );
+    print('Show rating dialog for ${widget.book.title}');
   }
 }
 
